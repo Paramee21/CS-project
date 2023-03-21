@@ -10,6 +10,10 @@ public class DialogueTrigger : MonoBehaviour
     [Header("Ink JSON")]
     [SerializeField] private TextAsset inkJSON;
 
+    [Header("Overlap Circle Settings")]
+    [SerializeField] private float overlapSize;
+    [SerializeField] private LayerMask overlapLayerMask;
+
     private bool playerInRange;
 
     private void Awake()
@@ -34,8 +38,30 @@ public class DialogueTrigger : MonoBehaviour
         }
     }
 
+    //for talk with NPC
+    private void FixedUpdate()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, overlapSize, overlapLayerMask);
+        playerInRange = false;
+
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.gameObject.CompareTag("Player"))
+            {
+                playerInRange = true;
+                Debug.Log("called.");
+                break;
+            }
+        }
+    }
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(transform.position, overlapSize);
+    }
+
     private void OnTriggerEnter2D(Collider2D collider)
     {
+        //for talk with object
         if (collider.gameObject.tag == "Player")
         {
             playerInRange = true;
@@ -44,6 +70,7 @@ public class DialogueTrigger : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collider)
     {
+        //for talk with object
         if (collider.gameObject.tag == "Player")
         {
             playerInRange = false;
